@@ -25,8 +25,16 @@
   </head>
 
   <body>
+    <h1>Three Body Interaction</h1>
+    <h2> Enter a starting point for the 'planet' and hit 'Go'. Refresh to reset. </h2>
+    <input id='start' type='number' name='start' value='650'></input>
+    <input type='submit' id='go' value='Go'></input>
+    <br/>
+    <br/>
+    <br/>
     <canvas id='viewport' width="300" height="300"></canvas>
 
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="physicsjs-full-0.5.3.js"> </script>
 
     <script>
@@ -89,12 +97,13 @@
         */
 
         body  = Physics.body('circle', {
-          x: 650, y : 400, 
+          x: $('#start').val(), y : 400, 
           vx : 0.0,
           vy: 0.08,  // velocity in y-direction
           radius: 20
         });
 
+        console.log(body);
         world.add(body);
 
         body2  = Physics.body('circle', {
@@ -132,7 +141,9 @@
         });
 
         // start the ticker
-        Physics.util.ticker.start();
+        $('#go').click(function() { 
+          Physics.util.ticker.start();
+        });
 
       });
 
