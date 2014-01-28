@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<!--[if lte IE 9]>
+<html class="ie" lang="en">
+  <![endif]-->
+  <!--[if gt IE 9]><!-->
+  <html lang="en">
+    <!--<![endif]-->
+
+<head>
+    <style>
+      body {
+        background: #ffffff;
+      }
+      .pjs-meta {
+        display: none;
+      }
+
+      #viewport {
+        border: 1px solid #666;
+      }
+
+    </style>
+
+
+  </head>
+
+  <body>
+    <canvas id='viewport' width="300" height="300"></canvas>
+
+    <script src="physicsjs-full-0.5.3.js"> </script>
+
+    <script>
+
+      offset = 0;
+      bodies = Array();
+
+      for (var i = 0; i < 200; i = i + 1) {
+        bodies.push(Physics.body('circle', {
+          x: 50 + 20*i, // x-coordinate
+          y: 30 + 20*i, // y-coordinate
+          vx: 0.2, // velocity in x-direction
+          vy: 0.01, // velocity in y-direction
+          radius: 5
+        }));
+      }
+
+
+
+      Physics(function(world) {
+
+        var viewWidth = 1400;
+        var viewHeight = 2000;
+
+        var renderer = Physics.renderer('canvas', {
+          el: 'viewport',
+          width: viewWidth,
+          height: viewHeight,
+          meta: false, // don't display meta data
+          styles: {
+            // set colors for the circle bodies
+            'circle' : {
+              strokeStyle: 'hsla(60, 37%, 17%, 1)',
+              lineWidth: 1,
+              fillStyle: 'rgb(200, 200, 256)',
+              angleIndicator: 'hsla(60, 37%, 17%, 0.4)'
+            }
+          }
+        });
+
+        // add the renderer
+        world.add( renderer );
+        // render on each step
+
+        world.subscribe('step', function(){
+          world.render();
+        });
+
+        // bounds of the window
+        var viewportBounds = Physics.aabb(0, 0, viewWidth, viewHeight);
+
+        // constrain objects to these bounds
+        /*
+        world.add(Physics.behavior('edge-collision-detection', {
+          aabb: viewportBounds,
+          restitution: 0.0,
+          cof: 0.0
+        }));
+
+        */
+
+        body  = Physics.body('circle', {
+          x: 650, y : 400, 
+          vx : 0.0,
+          vy: 0.08,  // velocity in y-direction
+          radius: 20
+        });
+
+        world.add(body);
+
+        body2  = Physics.body('circle', {
+          x: 400, y : 400, 
+          vx : 0,
+          vy: 0.0,  // velocity in y-direction
+          radius: 50
+        });
+
+        world.add(body2);
+
+
+        body3  = Physics.body('circle', {
+          x: 900, y : 600, 
+          vx : 0,
+          vy: 0.0,  // velocity in y-direction
+          radius: 50
+        });
+
+        world.add(body3);
+
+        //manageBodies(world);
+        // ensure objects bounce when edge collision is detected
+        //world.add( Physics.behavior('body-impulse-response') );
+        //world.add( Physics.behavior('body-collision-detection') );
+        //world.add( Physics.behavior('sweep-prune') );
+
+        // add some gravity
+        world.add( Physics.behavior('newtonian'), {strength : 100});
+
+        // subscribe to ticker to advance the simulation
+        Physics.util.ticker.subscribe(function( time, dt ){
+
+          world.step( time );
+        });
+
+        // start the ticker
+        Physics.util.ticker.start();
+
+      });
+
+      function manageBodies(world) {
+
+        for (var j = offset; j < offset + bodies.length/10 && j < bodies.length; j += 1) {
+          world.removeBody(bodies[j]);
+        bodies[j] = Physics.body('circle', {
+          x: 00 + 0*(j - offset), // x-coordinate
+          y: 0 + 0*(j - offset), // y-coordinate
+          vx: 0.05 + 0.01*(j - offset), // velocity in x-direction
+          vy: 0.1 + 0.01*(j- offset), // velocity in y-direction
+          radius: 3
+        });
+          world.add(bodies[j]);
+        }
+
+        offset += bodies.length/10;
+        if (offset >= bodies.length) {
+          offset = 0;
+        }
+        setTimeout(function() {  manageBodies(world); }, 100);
+      }
+      
+    </script>
+
+  </body>
+</html>
